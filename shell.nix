@@ -1,18 +1,22 @@
-{ pkgs ? import <nixpkgs> {}
-}:
+let
+  mozilla = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
+  nixpkgs = import <nixpkgs> { overlays = [ mozilla ]; };
+in
 
-pkgs.mkShell {
-  buildInputs = with pkgs; [
-    (
-      rustChannelOfTargets "stable" null [
-        "x86_64-unknown-linux-gnu"
-        "wasm32-unknown-unknown"
-      ]
-    )
+  with nixpkgs;
 
-    wasm-pack
+  pkgs.mkShell {
+    buildInputs = with pkgs; [
+      (
+        rustChannelOfTargets "stable" null [
+          "x86_64-unknown-linux-gnu"
+          "wasm32-unknown-unknown"
+        ]
+      )
 
-    yarn
-    nodejs
-  ];
-}
+      wasm-pack
+
+      yarn
+      nodejs
+    ];
+  }
